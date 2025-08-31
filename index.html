@@ -205,7 +205,7 @@
                 // 检测运行环境并选择合适的 URL
                 const isGitHubPages = window.location.hostname.includes('github.io');
                 const uploadUrl = isGitHubPages ?
-                    'https://corsproxy.io/?http://106.15.184.68:8080/api/upload-json' :
+                    'http://106.15.184.68/api/upload-json' :
                     'http://106.15.184.68:8080/api/upload-json';
 
                 // 发送到云服务器
@@ -286,7 +286,7 @@
                 // 检测运行环境并选择合适的 URL
                 const isGitHubPages = window.location.hostname.includes('github.io');
                 const healthUrl = isGitHubPages ?
-                    'https://corsproxy.io/?http://106.15.184.68:8080/api/health' :
+                    'http://106.15.184.68/api/health' :
                     'http://106.15.184.68:8080/api/health';
 
                 console.log('🌐 测试连接到:', healthUrl);
