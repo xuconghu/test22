@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云服务器上传测试</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            box-sizing: border-box;
+        }
+        
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4caf50;
+            color: #4caf50;
+        }
+        
+        .error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #f44336;
+            color: #f44336;
+        }
+        
+        .info {
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid #2196f3;
+            color: #2196f3;
+        }
+        
+        .server-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 云服务器上传测试</h1>
+        
+        <div class="server-info">
+            <strong>📍 目标服务器:</strong> 106.15.184.68<br>
+            <strong>📁 上传路径:</strong> /var/www/candy-game/data/<br>
+            <strong>🔗 API 端点:</strong> /api/upload-json
+        </div>
+        
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="testData">🎯 测试数据 (随便输入点什么):</label>
+                <input type="text" id="testData" placeholder="比如: 123, hello world, 测试数据..." required>
+            </div>
+            
+            <div class="form-group">
+                <label for="userName">👤 用户名 (可选):</label>
+                <input type="text" id="userName" placeholder="输入你的名字" value="测试用户">
+            </div>
+            
+            <div class="form-group">
+                <label for="additionalInfo">📝 额外信息 (可选):</label>
+                <textarea id="additionalInfo" placeholder="可以输入一些额外的测试信息..."></textarea>
+            </div>
+            
+            <button type="button" id="testBtn" onclick="testConnection()">🔍 测试服务器连接</button>
+            <button type="submit" id="uploadBtn">📤 上传到云服务器</button>
+        </form>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const uploadBtn = document.getElementById('uploadBtn');
+            const result = document.getElementById('result');
+            
+            // 获取表单数据
+            const testData = document.getElementById('testData').value;
+            const userName = document.getElementById('userName').value || '测试用户';
+            const additionalInfo = document.getElementById('additionalInfo').value;
+            
+            // 构造测试JSON数据
+            const testJsonData = {
+                timestamp: new Date().toISOString(),
+                testData: testData,
+                userName: userName,
+                additionalInfo: additionalInfo,
+                testType: 'upload_test',
+                metadata: {
+                    browser: navigator.userAgent,
+                    timestamp: Date.now(),
+                    randomId: Math.random().toString(36).substr(2, 9)
+                }
+            };
+            
+            // 显示上传中状态
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '⏳ 正在上传...';
+            showResult('🔄 正在连接云服务器...', 'info');
+            
+            try {
+                // 创建JSON文件
+                const jsonBlob = new Blob([JSON.stringify(testJsonData, null, 2)], {
+                    type: 'application/json;charset=utf-8;'
+                });
+                
+                // 生成文件名
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+                const filename = `test_upload_${timestamp}_${Date.now()}.json`;
+                
+                // 准备表单数据
+                const formData = new FormData();
+                formData.append('jsonFile', jsonBlob, filename);
+                formData.append('userName', userName);
+                formData.append('userGender', '');
+                formData.append('userId', `test_${Date.now()}`);
+                formData.append('uploadTime', new Date().toISOString());
+                formData.append('fileType', 'upload_test');
+                formData.append('totalEvents', 1);
+                
+                // 发送到云服务器
+                console.log('🌐 正在发送请求到:', 'http://106.15.184.68/api/upload-json');
+                console.log('📦 发送的数据:', formData);
+
+                const response = await fetch('http://106.15.184.68/api/upload-json', {
+                    method: 'POST',
+                    mode: 'cors', // 明确指定 CORS 模式
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`上传失败: ${response.status} ${response.statusText}`);
+                }
+                
+                const result_data = await response.json();
+                
+                showResult(`✅ 上传成功！
+                📁 文件名: ${result_data.data.filename}
+                📊 文件大小: ${result_data.data.size} 字节
+                ⏰ 上传时间: ${result_data.data.uploadTime}
+                🎯 测试数据: "${testData}"`, 'success');
+                
+                // 重置表单
+                document.getElementById('testData').value = '';
+                document.getElementById('additionalInfo').value = '';
+                
+            } catch (error) {
+                console.error('❌ 上传失败:', error);
+                console.error('错误类型:', error.name);
+                console.error('错误详情:', error.message);
+
+                let errorMessage = `❌ 上传失败: ${error.message}\n\n`;
+
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMessage += `🔍 网络连接问题，请检查：
+                    • 云服务器是否启动 (106.15.184.68)
+                    • 服务器是否运行在端口 80
+                    • 防火墙是否阻止了连接
+                    • 是否有网络连接`;
+                } else if (error.message.includes('CORS')) {
+                    errorMessage += `🔍 跨域访问问题，请检查：
+                    • 服务器 CORS 配置
+                    • 是否允许本地访问`;
+                } else {
+                    errorMessage += `🔍 可能的原因:
+                    • 网络连接问题
+                    • 服务器未启动
+                    • API 端点不存在
+                    • 服务器内部错误`;
+                }
+
+                showResult(errorMessage, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '📤 上传到云服务器';
+            }
+        });
+        
+        function showResult(message, type) {
+            const result = document.getElementById('result');
+            result.textContent = message;
+            result.className = `result ${type}`;
+            result.style.display = 'block';
+        }
+
+        // 测试服务器连接
+        async function testConnection() {
+            const testBtn = document.getElementById('testBtn');
+            const originalText = testBtn.textContent;
+
+            testBtn.disabled = true;
+            testBtn.textContent = '🔄 测试中...';
+            showResult('🔍 正在测试服务器连接...', 'info');
+
+            try {
+                console.log('🌐 测试连接到:', 'http://106.15.184.68/api/health');
+
+                const response = await fetch('http://106.15.184.68/api/health', {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ 服务器连接成功！
+                    📍 服务器状态: ${data.status}
+                    ⏰ 服务器时间: ${data.timestamp}
+                    💬 消息: ${data.message || '服务器运行正常'}`, 'success');
+                } else {
+                    showResult(`⚠️ 服务器响应异常
+                    📊 状态码: ${response.status}
+                    📝 状态文本: ${response.statusText}`, 'error');
+                }
+
+            } catch (error) {
+                console.error('连接测试失败:', error);
+                showResult(`❌ 无法连接到服务器
+                错误: ${error.message}
+
+                请检查:
+                • 服务器是否启动 (106.15.184.68:80)
+                • 网络连接是否正常
+                • 防火墙设置`, 'error');
+            } finally {
+                testBtn.disabled = false;
+                testBtn.textContent = originalText;
+            }
+        }
+    </script>
+</body>
+</html>
