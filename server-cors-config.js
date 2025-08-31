@@ -10,7 +10,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = 80;
+const PORT = 8080;
 
 // 1. CORS 配置 - 支持 GitHub Pages
 app.use(cors({

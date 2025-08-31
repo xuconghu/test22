@@ -123,7 +123,7 @@
         <h1>🚀 云服务器上传测试</h1>
         
         <div class="server-info">
-            <strong>📍 目标服务器:</strong> 106.15.184.68<br>
+            <strong>📍 目标服务器:</strong> 106.15.184.68:8080<br>
             <strong>📁 上传路径:</strong> /var/www/candy-game/data/<br>
             <strong>🔗 API 端点:</strong> /api/upload-json
         </div>
@@ -205,8 +205,8 @@
                 // 检测运行环境并选择合适的 URL
                 const isGitHubPages = window.location.hostname.includes('github.io');
                 const uploadUrl = isGitHubPages ?
-                    'https://cors-anywhere.herokuapp.com/http://106.15.184.68/api/upload-json' :
-                    'http://106.15.184.68/api/upload-json';
+                    'https://corsproxy.io/?http://106.15.184.68:8080/api/upload-json' :
+                    'http://106.15.184.68:8080/api/upload-json';
 
                 // 发送到云服务器
                 console.log('🌐 正在发送请求到:', uploadUrl);
@@ -286,8 +286,8 @@
                 // 检测运行环境并选择合适的 URL
                 const isGitHubPages = window.location.hostname.includes('github.io');
                 const healthUrl = isGitHubPages ?
-                    'https://cors-anywhere.herokuapp.com/http://106.15.184.68/api/health' :
-                    'http://106.15.184.68/api/health';
+                    'https://corsproxy.io/?http://106.15.184.68:8080/api/health' :
+                    'http://106.15.184.68:8080/api/health';
 
                 console.log('🌐 测试连接到:', healthUrl);
 
