@@ -202,11 +202,17 @@
                 formData.append('fileType', 'upload_test');
                 formData.append('totalEvents', 1);
                 
+                // 检测运行环境并选择合适的 URL
+                const isGitHubPages = window.location.hostname.includes('github.io');
+                const uploadUrl = isGitHubPages ?
+                    'https://cors-anywhere.herokuapp.com/http://106.15.184.68/api/upload-json' :
+                    'http://106.15.184.68/api/upload-json';
+
                 // 发送到云服务器
-                console.log('🌐 正在发送请求到:', 'http://106.15.184.68/api/upload-json');
+                console.log('🌐 正在发送请求到:', uploadUrl);
                 console.log('📦 发送的数据:', formData);
 
-                const response = await fetch('http://106.15.184.68/api/upload-json', {
+                const response = await fetch(uploadUrl, {
                     method: 'POST',
                     mode: 'cors', // 明确指定 CORS 模式
                     body: formData
@@ -277,9 +283,15 @@
             showResult('🔍 正在测试服务器连接...', 'info');
 
             try {
-                console.log('🌐 测试连接到:', 'http://106.15.184.68/api/health');
+                // 检测运行环境并选择合适的 URL
+                const isGitHubPages = window.location.hostname.includes('github.io');
+                const healthUrl = isGitHubPages ?
+                    'https://cors-anywhere.herokuapp.com/http://106.15.184.68/api/health' :
+                    'http://106.15.184.68/api/health';
 
-                const response = await fetch('http://106.15.184.68/api/health', {
+                console.log('🌐 测试连接到:', healthUrl);
+
+                const response = await fetch(healthUrl, {
                     method: 'GET',
                     mode: 'cors'
                 });
